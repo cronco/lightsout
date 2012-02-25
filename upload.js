@@ -1,7 +1,13 @@
 
 function init() {
 	var img = new Image(),
-		canv = document.getElementById('canvas');
+		canv = document.getElementById('canvas'),
+		imgCanv = document.getElementById('extra-canvas');
+	
+	imgCanv.width = window.innerWidth + 200;
+	imgCanv.height = window.innerHeight + 200;
+
+
 
 
 	function handleFiles(files) {
@@ -14,16 +20,16 @@ function init() {
 			  
 			 console.log(file.name); 
 			var newImg = new Image(),
-				cont = canv.getContext("2d");
+				cont = imgCanv.getContext("2d");
 			newImg.file = file;
 
 		var reader = new FileReader();
 		reader.onload = (function(aImg) {return function(e) {
 				aImg.src = e.target.result;
 				cont.globalCompositeOperation = "copy";
-				cont.drawImage(aImg, 10, 10, img.width, img.height);
-				cont.globalCompositeOperation = "source-over";
-				cont.drawImage(img, 10, 10);
+				cont.drawImage(aImg, 0, 0, aImg.width, aImg.height);
+				//cont.globalCompositeOperation = "source-over";
+				//cont.drawImage(img, 0, 0);
 			}; 
 		}) (newImg);
 		reader.readAsDataURL(file);
@@ -32,7 +38,7 @@ function init() {
 	img.onload = function() {
 
 		var cont = canv.getContext("2d");
-		cont.drawImage(img, 10, 10);
+		cont.drawImage(img, 0, 0);
 		cont.globalCompositeOperation = "copy";
 		console.log("test");
 	};
