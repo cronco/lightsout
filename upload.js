@@ -1,4 +1,4 @@
-function init() {
+jQuery(document).ready(function($){
 	var img = new Image(),
 		canv = document.getElementById('canvas'),
 		imgCanv = document.getElementById('extra-canvas'),
@@ -111,4 +111,4 @@ function init() {
 
 
 
-}
+});
