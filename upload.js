@@ -89,24 +89,26 @@ function init() {
 		var mouseX = e.screenX,
 			mouseY = e.screenY;
 
+		function dragListener(e) {
+
+			console.log(e.screenX - mouseX, e.screenY - mouseY);
+			moveImage(e.screenX - mouseX, e.screenY - mouseY);
+			mouseX = e.screenX;
+			mouseY = e.screenY;
+		}
+
 		console.log(mouseX, mouseY);
 		if(e.button == 0) {
-			dragListener = imgCanv.addEventListener("mousemove",function(e){
-				
-				console.log(e.screenX - mouseX, e.screenY - mouseY);
-			   	moveImage(e.screenX - mouseX, e.screenY - mouseY);
-				mouseX = e.screenX;
-				mouseY = e.screenY;
-			});
+			dragListener = imgCanv.addEventListener("mousemove", dragListener);
 		}
+
+		imgCanv.addEventListener("mouseup", function(e) {
+
+			imgCanv.addEventListener("mousemove", null);
+			console.log("werking");
+		});
 	});
 
-	imgCanv.addEventListener("mouseup", function(e) {
-
-		if (e.button == 0) {
-			imgCanv.removeEventListener("mousemove", dragListener);
-		}
-	});
 
 
 }
