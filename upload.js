@@ -28,8 +28,6 @@ function init() {
 				aImg.src = e.target.result;
 				cont.globalCompositeOperation = "copy";
 				cont.drawImage(aImg, 0, 0, aImg.width, aImg.height);
-				//cont.globalCompositeOperation = "source-over";
-				//cont.drawImage(img, 0, 0);
 			}; 
 		}) (newImg);
 		reader.readAsDataURL(file);
