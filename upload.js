@@ -1,14 +1,14 @@
-
 function init() {
 	var img = new Image(),
 		canv = document.getElementById('canvas'),
-		imgCanv = document.getElementById('extra-canvas');
+		imgCanv = document.getElementById('extra-canvas'),
+		userImg = new Image(),
+		dragListener;
 	
 	imgCanv.width = window.innerWidth + 200;
 	imgCanv.height = window.innerHeight + 200;
-
-
-
+	userImg.x = 0;
+	userImg.y = 0;
 
 	function handleFiles(files) {
 		for (var i = 0; i < files.length; i++) {  
@@ -26,13 +26,17 @@ function init() {
 		var reader = new FileReader();
 		reader.onload = (function(aImg) {return function(e) {
 				aImg.src = e.target.result;
-				cont.globalCompositeOperation = "copy";
+				//cont.globalCompositeOperation = "copy";
 				cont.drawImage(aImg, 0, 0, aImg.width, aImg.height);
+				userImg = aImg;
+				userImg.x = 0;
+				userImg.y = 0;
 			}; 
 		}) (newImg);
 		reader.readAsDataURL(file);
 		}
 	}
+
 	img.onload = function() {
 
 		var cont = canv.getContext("2d");
@@ -61,6 +65,48 @@ function init() {
 		handleFiles(files);
 	};
 	img.src = "cov.png";
+
+
+	function moveImage(x, y) {
+		var cont = imgCanv.getContext("2d");
+		cont.clearRect(userImg.x - 1, userImg.y - 1, userImg.width + 1, userImg.height + 1);
+		userImg.x = userImg.x + x;
+		userImg.y = userImg.y + y;
+		cont.drawImage(userImg, userImg.x, userImg.y);
+		console.log("userImg:", userImg.x, userImg.y);
+
+	}
+
+	imgCanv.addEventListener("mouseover", function(e) {
+		document.body.style.cursor = "pointer";
+	});
+
+	imgCanv.addEventListener("mouseout", function(e) {
+		document.body.style.cursor = "normal";
+	});
+
+	imgCanv.addEventListener("mousedown", function(e) {
+		var mouseX = e.screenX,
+			mouseY = e.screenY;
+
+		console.log(mouseX, mouseY);
+		if(e.button == 0) {
+			dragListener = imgCanv.addEventListener("mousemove",function(e){
+				
+				console.log(e.screenX - mouseX, e.screenY - mouseY);
+			   	moveImage(e.screenX - mouseX, e.screenY - mouseY);
+				mouseX = e.screenX;
+				mouseY = e.screenY;
+			});
+		}
+	});
+
+	imgCanv.addEventListener("mouseup", function(e) {
+
+		if (e.button == 0) {
+			imgCanv.removeEventListener("mousemove", dragListener);
+		}
+	});
 
 
 }
