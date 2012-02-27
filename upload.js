@@ -7,8 +7,7 @@ jQuery(document).ready(function($){
 	
 	imgCanv.width = window.innerWidth + 200;
 	imgCanv.height = window.innerHeight + 200;
-	userImg.x = 0;
-	userImg.y = 0;
+	$(userImg).data('x', 0).data('y', 0);
 
 	function handleFiles(files) {
 		for (var i = 0; i < files.length; i++) {  
@@ -29,33 +28,31 @@ jQuery(document).ready(function($){
 				//cont.globalCompositeOperation = "copy";
 				cont.drawImage(aImg, 0, 0, aImg.width, aImg.height);
 				userImg = aImg;
-				userImg.x = 0;
-				userImg.y = 0;
+				$(userImg).data('x',0).data('y',0);
 			}; 
 		}) (newImg);
 		reader.readAsDataURL(file);
 		}
 	}
 
-	img.onload = function() {
+	$(img).bind('load', function() {
 
 		var cont = canv.getContext("2d");
 		cont.drawImage(img, 0, 0);
 		cont.globalCompositeOperation = "copy";
 		console.log("test");
-	};
-
-	canv.addEventListener("dragenter", function(e) {
-		e.stopPropagation();
-		e.preventDefault();
 	});
 
-	canv.addEventListener("dragover", function(e) {
+	$(canv).bind("dragenter", function(e) {
+		e.stopPropagation();
+		e.preventDefault();
+	}).bind("dragover", function(e) {
 		e.stopPropagation();
 		e.preventDefault();
 	});
 
 	canv.ondrop = function(e) {
+
 		e.stopPropagation();
 		e.preventDefault();
 
@@ -68,24 +65,21 @@ jQuery(document).ready(function($){
 
 
 	function moveImage(x, y) {
-		var cont = imgCanv.getContext("2d");
-		cont.clearRect(userImg.x - 1, userImg.y - 1, userImg.width + 1, userImg.height + 1);
-		userImg.x = userImg.x + x;
-		userImg.y = userImg.y + y;
-		cont.drawImage(userImg, userImg.x, userImg.y);
-		console.log("userImg:", userImg.x, userImg.y);
+		var cont = imgCanv.getContext("2d"),
+			$i = $(userImg);
+		cont.clearRect($i.data('x') - 1, $i.data('y') - 1, userImg.width + 1, userImg.height + 1);
+		$i.data('x', $i.data('x') + x);
+		$i.data('y', $i.data('y') + y);
+		cont.drawImage(userImg, $i.data('x'), $i.data('y'));
+		console.log("userImg:", $i.data('x'), $i.data('y'));
 
 	}
 
-	imgCanv.addEventListener("mouseover", function(e) {
+	$(imgCanv).bind("mouseover", function(e) {
 		document.body.style.cursor = "pointer";
-	});
-
-	imgCanv.addEventListener("mouseout", function(e) {
+	}).bind("mouseout", function(e) {
 		document.body.style.cursor = "normal";
-	});
-
-	imgCanv.addEventListener("mousedown", function(e) {
+	}).bind("mousedown", function(e) {
 		var mouseX = e.screenX,
 			mouseY = e.screenY;
 
@@ -97,16 +91,13 @@ jQuery(document).ready(function($){
 			mouseY = e.screenY;
 		}
 
-		console.log(mouseX, mouseY);
 		if(e.button == 0) {
-			dragListener = imgCanv.addEventListener("mousemove", dragListener);
+			 $(this).bind("mousemove", dragListener);
 		}
 
-		imgCanv.addEventListener("mouseup", function(e) {
+		}).bind("mouseup", function(e) {
 
-			imgCanv.addEventListener("mousemove", null);
-			console.log("werking");
-		});
+			$(this).unbind("mousemove", null);
 	});
 
 
