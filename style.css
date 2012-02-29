@@ -17,3 +17,12 @@ body {
 	top:0px;
 	left:0px;
 }
+
+#download {
+	background:url("filedown.png");
+	width:24px;
+	height:30px;
+	position:absolute;
+	top:10px;
+	right:15px;
+}
