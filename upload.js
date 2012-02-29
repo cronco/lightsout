@@ -56,6 +56,7 @@ jQuery(document).ready(function($){
 					.data('w', userImg.width)
 					.data('h', userImg.height);
 				drawAnchors(imgCanv, $(userImg));
+				drawCover();
 			}; 
 		}) (newImg);
 		reader.readAsDataURL(file);
@@ -64,14 +65,20 @@ jQuery(document).ready(function($){
 
 	$(img).bind('load', function() {
 
-		var cont = canv.getContext("2d");
-		cont.drawImage(img, 0, 0);
-		cont.globalCompositeOperation = "copy";
+		var cont = imgCanv.getContext("2d");
+		cont.drawImage(img, $(imgCanv).width() / 2 - img.width / 2,
+		   	$(imgCanv).height() / 2 - img.height / 2);
 		console.log("test");
 	});
 
 	img.src = "cov.png";
 
+	function drawCover() {
+
+		var cont = imgCanv.getContext("2d");
+		cont.drawImage(img, $(imgCanv).width() / 2 - img.width / 2,
+		   	$(imgCanv).height() / 2 - img.height / 2);
+	}
 
 	
 	//draw resize anchors on image corners;
@@ -177,6 +184,7 @@ jQuery(document).ready(function($){
 		con.drawImage(userImg, $i.data('x'), $i.data('y'),
 				$i.data('w'), $i.data('h'));
 		drawAnchors(imgCanv, $i);
+		drawCover();
 		console.log("userImg:", $i.data('x'), $i.data('y'));
 
 	}
@@ -193,6 +201,7 @@ jQuery(document).ready(function($){
 			.data('x', $i.data('x') + x)
 			.data('y', $i.data('y') + y);
 		drawAnchors(imgCanv, $i);
+		drawCover();
 
 	}
 
@@ -262,6 +271,16 @@ jQuery(document).ready(function($){
 		}).bind("mouseup", function(e) {
 
 			$(this).unbind("mousemove", null);
+	});
+
+	$("#download").click(function(e) {
+		var con = canv.getContext("2d");
+		con.clearRect(0, 0, img.width, img.height);
+		con.drawImage(imgCanv, $(imgCanv).width() / 2 - img.width / 2,
+				$(imgCanv).height() / 2 - img.height / 2,
+				img.width, img.height,
+				0, 0, img.width, img.height);
+		Canvas2Image.saveAsPNG(canv);
 	});
 
 
