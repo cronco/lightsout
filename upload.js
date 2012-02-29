@@ -197,7 +197,9 @@ jQuery(document).ready(function($){
 	}
 
 	$(imgCanv).bind("mouseover", function(e) {
-		document.body.style.cursor = "pointer";
+		if(clickedInImage(e, $(imgCanv)[0], userImg)) {
+			document.body.style.cursor = "pointer";
+		}
 	}).bind("mouseout", function(e) {
 		document.body.style.cursor = "normal";
 		$(this).unbind("mousemove", null);
@@ -219,6 +221,14 @@ jQuery(document).ready(function($){
 		function resizeListener(e) {
 			var dx = e.clientX - mouseX,
 				dy = e.clientY - mouseY;
+
+			if(e.shiftKey) {
+				if (anchor == "top-left" || anchor == "bottom-right") {
+					dy = dx;
+				} else {
+					dy = -dx;
+				}
+			}
 
 			console.log(dx, dy);
 			switch (anchor) {
