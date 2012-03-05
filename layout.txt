@@ -1,3 +1,122 @@
 {
-    "play": { "x": 0, "y": 0, "w": 31, "h": 30, "show": true }
+    "art": {
+        "x": "",
+        "y": "",
+        "w": 150,
+        "h": 150,
+        "show": false
+    },
+    "play": {
+        "x": "185",
+        "y": "185",
+        "w": 31,
+        "h": 30,
+        "show": true
+    },
+    "prev": {
+        "x": "",
+        "y": "",
+        "w": 17,
+        "h": 11,
+        "show": false
+    },
+    "next": {
+        "x": "",
+        "y": "",
+        "w": 17,
+        "h": 11,
+        "show": false
+    },
+    "timeline": {
+        "x": "",
+        "y": "",
+        "w": "",
+        "h": 16,
+        "show": false
+    },
+    "currenttime": {
+        "x": "",
+        "y": "",
+        "w": "",
+        "h": "",
+        "show": false,
+        "styles": {
+            "fontSize": "",
+            "fontWeight": null,
+            "fontStyle": null,
+            "textAlign": null
+        }
+    },
+    "totaltime": {
+        "x": "",
+        "y": "",
+        "w": "",
+        "h": "",
+        "show": false,
+        "styles": {
+            "fontSize": "",
+            "fontWeight": null,
+            "fontStyle": null,
+            "textAlign": null
+        }
+    },
+    "tracklist": {
+        "x": "",
+        "y": "",
+        "w": "",
+        "h": "",
+        "show": false
+    },
+    "maintext": {
+        "x": "",
+        "y": "",
+        "w": "",
+        "h": "",
+        "show": false,
+        "styles": {
+            "fontSize": "",
+            "fontWeight": null,
+            "fontStyle": null,
+            "textAlign": null
+        }
+    },
+    "subtext": {
+        "x": "",
+        "y": "",
+        "w": "",
+        "h": "",
+        "show": false,
+        "styles": {
+            "fontSize": "",
+            "fontWeight": null,
+            "fontStyle": null,
+            "textAlign": null
+        }
+    },
+    "currenttitle": {
+        "x": "",
+        "y": "",
+        "w": "",
+        "h": "",
+        "show": false,
+        "styles": {
+            "fontSize": "",
+            "fontWeight": null,
+            "fontStyle": null,
+            "textAlign": null
+        }
+    },
+    "linkarea": {
+        "x": "0",
+        "y": "300",
+        "w": "400",
+        "h": "",
+        "show": true,
+        "styles": {
+            "fontSize": "10",
+            "fontWeight": null,
+            "fontStyle": null,
+            "textAlign": "center"
+        }
+    }
 }
