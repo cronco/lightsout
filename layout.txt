@@ -10,7 +10,7 @@
         "x": 0,
         "y": 300,
         "w": 400,
-        "h": "",
+        "h": 30,
         "show": true,
         "styles": {
             "fontSize": 10,
