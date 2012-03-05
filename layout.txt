@@ -1,5 +1,3 @@
 {
-    "play": { "x": 185, "y": 185, "w": 31, "h": 30, "show": true },
-    "linkarea": { "x": 0, "y": 300, "w": 400, "h": 30, "show": true, "styles": { "fontSize": 10,  "fontStyle": null, "textAlign": "center" }
-    }
+    "play": { "x": 185, "y": 185, "w": 31, "h": 30, "show": true }
 }
