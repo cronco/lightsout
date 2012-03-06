@@ -278,10 +278,10 @@ jQuery(document).ready(function($){
 	});
 
 	$("#download").click(function(e) {
-		var con = canv.getContext("2d");
+		var con = imgCanv.getContext("2d");
 		con.clearRect(0, 0, img.width, img.height);
-		con.drawImage(imgCanv, $(imgCanv).width() / 2 - img.width / 2,
-				$(imgCanv).height() / 2 - img.height / 2,
+		con.drawImage(canv, $(canv).width() / 2 - img.width / 2,
+				$(canv).height() / 2 - img.height / 2,
 				img.width, img.height,
 				0, 0, img.width, img.height);
 		Canvas2Image.saveAsJPEG(canv);
