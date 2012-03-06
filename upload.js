@@ -1,7 +1,7 @@
 jQuery(document).ready(function($){
 	var img = new Image(),
 		canv = document.getElementById('canvas'),
-		imgCanv = document.getElementById('extra-canvas'), // this will be the downloaded image
+		imgCanv = new Canvas(), // this will be the downloaded image
 		userImg = new Image(),
 		dragListener,
 		dim = 18;
