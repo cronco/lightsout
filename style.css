@@ -3,8 +3,6 @@ body {
 }
 
 #canvas {
-	border: 2px dashed #999;
-	border-radius:4px;
 	position:absolute;
 	top:0px;
 	left:0px;
