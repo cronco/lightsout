@@ -1,14 +1,16 @@
 jQuery(document).ready(function($){
 	var img = new Image(),
 		canv = document.getElementById('canvas'),
-		imgCanv = document.getElementById('extra-canvas'),
+		imgCanv = document.getElementById('extra-canvas'), // this will be the downloaded image
 		userImg = new Image(),
 		dragListener,
 		dim = 18;
 	
-	imgCanv.width = window.innerWidth;
-	imgCanv.height = window.innerHeight;
-	$(userImg).data('x', 0).data('y', 0);
+
+   	canv.width = window.innerWidth;
+	canv.height = window.innerHeight;
+	$(userImg).data('x', 0)
+			.data('y', 0);
 
 	$(canv).bind("dragenter", function(e) {
 		e.stopPropagation();
@@ -31,7 +33,7 @@ jQuery(document).ready(function($){
 
 	function handleFiles(files) {
 		var newImg = new Image(),
-			cont = imgCanv.getContext("2d"),
+			cont = canv.getContext("2d"),
 			reader = new FileReader(),
 			imageType = /image.*/,
 			file, i;
@@ -65,21 +67,22 @@ jQuery(document).ready(function($){
 
 	$(img).bind('load', function() {
 
-		var cont = imgCanv.getContext("2d");
-		cont.drawImage(img, $(imgCanv).width() / 2 - img.width / 2,
-		   	$(imgCanv).height() / 2 - img.height / 2);
+		var cont = canv.getContext("2d");
+		cont.drawImage(img, $(canv).width() / 2 - img.width / 2,
+		   	$(canv).height() / 2 - img.height / 2);
 		console.log("test");
+		imgCanv.width = img.width;
+		imgCanv.height = img.height;
 	});
 
 	img.src = "cov.png";
 
 	function drawCover() {
 
-		var cont = imgCanv.getContext("2d");
-		cont.drawImage(img, $(imgCanv).width() / 2 - img.width / 2,
-		   	$(imgCanv).height() / 2 - img.height / 2);
+		var cont = canv.getContext("2d");
+		cont.drawImage(img, $(canv).width() / 2 - img.width / 2,
+		   	$(canv).height() / 2 - img.height / 2);
 	}
-
 	
 	//draw resize anchors on image corners;
 	function drawAnchors(canvas, img) {
@@ -118,6 +121,7 @@ jQuery(document).ready(function($){
 		return con.isPointInPath(x, y);
 	}
 
+	//check to see if we clicked inside an anchor, and which one, if yes.
 	function clickedInAnchors(e, canvas, img) {
 
 		var con = canvas.getContext("2d"),
@@ -175,38 +179,39 @@ jQuery(document).ready(function($){
 		return null;
 	}
 
+	//what it says it does
 	function moveImage(x, y) {
-		var con = imgCanv.getContext("2d"),
+		var con = canv.getContext("2d"),
 			$i = $(userImg);
 		con.clearRect($i.data('x') - 1, $i.data('y') - 1, $i.data('w') + 1, $i.data('h') + 1);
 		$i.data('x', $i.data('x') + x);
 		$i.data('y', $i.data('y') + y);
 		con.drawImage(userImg, $i.data('x'), $i.data('y'),
 				$i.data('w'), $i.data('h'));
-		drawAnchors(imgCanv, $i);
+		drawAnchors(canv, $i);
 		drawCover();
 		console.log("userImg:", $i.data('x'), $i.data('y'));
 
 	}
 
 	function resizeImage(x, y, w, h) {
-		var con = imgCanv.getContext("2d"),
+		var con = canv.getContext("2d"),
 			$i = $(userImg);
 
-		con.clearRect(0, 0, $(imgCanv).width(), $(imgCanv).height());
+		con.clearRect(0, 0, $(canv).width(), $(canv).height());
 		con.drawImage(userImg, $i.data('x') + x, $i.data('y') + y,
 					$i.data('w') + w, $i.data('h') + h);
 		$i.data('w', $i.data('w') + w)
 			.data('h', $i.data('h') + h)
 			.data('x', $i.data('x') + x)
 			.data('y', $i.data('y') + y);
-		drawAnchors(imgCanv, $i);
+		drawAnchors(canv, $i);
 		drawCover();
 
 	}
 
-	$(imgCanv).bind("mouseover", function(e) {
-		if(clickedInImage(e, $(imgCanv)[0], userImg)) {
+	$(canv).bind("mouseover", function(e) {
+		if(clickedInImage(e, $(canv)[0], userImg)) {
 			document.body.style.cursor = "pointer";
 		}
 	}).bind("mouseout", function(e) {
@@ -215,7 +220,6 @@ jQuery(document).ready(function($){
 	}).bind("mousedown", function(e) {
 		var mouseX = e.clientX,
 			mouseY = e.clientY,
-			can = $(this)[0],
 			$i = $(userImg),
 			anchor;
 
@@ -260,10 +264,10 @@ jQuery(document).ready(function($){
 
 		if(e.button == 0) {
 
-			anchor = clickedInAnchors(e, can, $i);
+			anchor = clickedInAnchors(e, canv, $i);
 			if(anchor) {
 				$(this).bind("mousemove", resizeListener);
-			} else if(clickedInImage(e, can, $i)) {
+			} else if(clickedInImage(e, canv, $i)) {
 				$(this).bind("mousemove", dragListener);
 			}
 		}
