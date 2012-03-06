@@ -9,6 +9,8 @@ jQuery(document).ready(function($){
 
    	canv.width = window.innerWidth;
 	canv.height = window.innerHeight;
+	$(canv).data('w', canv.width)
+			.data('h', canv.height);
 	$(userImg).data('x', 0)
 			.data('y', 0);
 
@@ -49,15 +51,46 @@ jQuery(document).ready(function($){
 			newImg.file = file;
 
 		reader.onload = (function(aImg) {return function(e) {
+				var x, y, w, h, ratio, portrait;
 				aImg.src = e.target.result;
-				cont.drawImage(aImg, 0, 0, aImg.width, aImg.height);
+				cont.clearRect(0, 0, $(canv).data('w'), $(canv).data('h'));
+				if(aImg.width <= $(canv).data('w') && aImg.height <= $(canv).data('h')) {
+					x =  $(canv).data('w') / 2 - aImg.width / 2;
+					y = $(canv).data('h')  / 2 - aImg.height / 2;
+					w = aImg.width, h = aImg.height;
+					cont.drawImage(aImg,x, y, w, h);
+				} else if(aImg.width <= $(canv).data('w')) {
+					ratio = aImg.height / $(canv).data('h');
+					w = aImg.width / ratio, h = $(canv).data('h');
+					x =  $(canv).data('w') / 2 - w / 2;
+					y = 0;
+				} else if(aImg.height <= $(canv).data('h')) {
+					ratio = aImg.width / $(canv).data('w');
+					w = aImg.width, h = aImg.height * ratio;
+					x =  0;
+					y =  $(canv).data('h') / 2 - h / 2;
+				} else {
+					portrait = (aImg.width / aImg.height <= $(canv).data('w') / $(canv).data('h'));
+					if(portrait) {
+						ratio = aImg.height / $(canv).data('h');
+						h = $(canv).data('h');
+						w = aImg.width / ratio;
+					} else {
+						ratio = aImg.width / $(canv).data('w');
+						w = $(canv).data('w');
+						h = aImg.height / ratio;
+					}
+					x = $(canv).data('w') / 2 - w / 2;
+					y = $(canv).data('h') / 2 - h / 2;
+				}
+				cont.drawImage(aImg,x, y, w, h);
 				userImg = aImg;
 				$(userImg)
-					.data('x',0)
-					.data('y',0)
-					.data('w', userImg.width)
-					.data('h', userImg.height);
-				drawAnchors(imgCanv, $(userImg));
+					.data('x',x)
+					.data('y',y)
+					.data('w', w)
+					.data('h', h);
+				drawAnchors(canv, $(userImg));
 				drawCover();
 			}; 
 		}) (newImg);
