@@ -284,7 +284,7 @@ jQuery(document).ready(function($){
 				$(canv).height() / 2 - img.height / 2,
 				img.width, img.height,
 				0, 0, img.width, img.height);
-		Canvas2Image.saveAsJPEG(canv);
+		Canvas2Image.saveAsJPEG(imgCanv);
 	});
 
 
