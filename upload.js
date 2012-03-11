@@ -311,6 +311,7 @@ jQuery(document).ready(function($){
 	});
 
 	$("#download").click(function(e) {
+		e.preventDefault();
 		var con = imgCanv.getContext("2d");
 		con.clearRect(0, 0, img.width, img.height);
 		con.drawImage(canv, $(canv).width() / 2 - img.width / 2,
@@ -318,6 +319,16 @@ jQuery(document).ready(function($){
 				img.width, img.height,
 				0, 0, img.width, img.height);
 		Canvas2Image.saveAsJPEG(imgCanv);
+	});
+
+	$("#upload").click(function(e) {
+		
+		$("#upload-elem").click();
+
+	});
+
+	$("#upload-elem").change(function(e) {
+		handleFiles(this.files);
 	});
 
 
