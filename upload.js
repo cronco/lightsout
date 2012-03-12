@@ -54,34 +54,34 @@ jQuery(document).ready(function($){
 				var x, y, w, h, ratio, portrait;
 				aImg.src = e.target.result;
 				cont.clearRect(0, 0, $(canv).data('w'), $(canv).data('h'));
-				if(aImg.width <= $(canv).data('w') && aImg.height <= $(canv).data('h')) {
-					x =  $(canv).data('w') / 2 - aImg.width / 2;
-					y = $(canv).data('h')  / 2 - aImg.height / 2;
-					w = aImg.width, h = aImg.height;
+				if(aImg.width / 2 <= $(canv).data('w') && aImg.height  / 2 <= $(canv).data('h')) {
+					x =  $(canv).data('w') / 2 - aImg.width / 4;
+					y = $(canv).data('h')  / 2 - aImg.height / 4;
+					w = aImg.width / 2, h = aImg.height / 2;
 					cont.drawImage(aImg,x, y, w, h);
-				} else if(aImg.width <= $(canv).data('w')) {
+				} else if(aImg.width / 2 <= $(canv).data('w')) {
 					ratio = aImg.height / $(canv).data('h');
-					w = aImg.width / ratio, h = $(canv).data('h');
-					x =  $(canv).data('w') / 2 - w / 2;
+					w = aImg.width / ratio * 2, h = $(canv).data('h');
+					x =  $(canv).data('w') / 2 - w / 4;
 					y = 0;
-				} else if(aImg.height <= $(canv).data('h')) {
+				} else if(aImg.height / 2 <= $(canv).data('h')) {
 					ratio = aImg.width / $(canv).data('w');
-					w = aImg.width, h = aImg.height * ratio;
+					w = aImg.width, h = aImg.height * ratio / 2;
 					x =  0;
-					y =  $(canv).data('h') / 2 - h / 2;
+					y =  $(canv).data('h') / 2 - h / 4;
 				} else {
 					portrait = (aImg.width / aImg.height <= $(canv).data('w') / $(canv).data('h'));
 					if(portrait) {
 						ratio = aImg.height / $(canv).data('h');
 						h = $(canv).data('h');
-						w = aImg.width / ratio;
+						w = aImg.width / ratio * 2;
 					} else {
 						ratio = aImg.width / $(canv).data('w');
 						w = $(canv).data('w');
-						h = aImg.height / ratio;
+						h = aImg.height / ratio * 2;
 					}
-					x = $(canv).data('w') / 2 - w / 2;
-					y = $(canv).data('h') / 2 - h / 2;
+					x = $(canv).data('w') / 2 - w / 4;
+					y = $(canv).data('h') / 2 - h / 4;
 				}
 				cont.drawImage(aImg,x, y, w, h);
 				userImg = aImg;
@@ -101,20 +101,22 @@ jQuery(document).ready(function($){
 	$(img).bind('load', function() {
 
 		var cont = canv.getContext("2d");
-		cont.drawImage(img, $(canv).width() / 2 - img.width / 2,
-		   	$(canv).height() / 2 - img.height / 2);
+		cont.drawImage(img, $(canv).width() / 2 - img.width / 4,
+		   	$(canv).height() / 2 - img.height / 4,
+			img.width / 2, img.height / 2);
 		console.log("test");
 		imgCanv.width = img.width;
 		imgCanv.height = img.height;
 	});
 
-	img.src = "cov.png";
+	img.src = "cover.png";
 
 	function drawCover() {
 
 		var cont = canv.getContext("2d");
-		cont.drawImage(img, $(canv).width() / 2 - img.width / 2,
-		   	$(canv).height() / 2 - img.height / 2);
+		cont.drawImage(img, $(canv).width() / 2 - img.width / 4,
+		   	$(canv).height() / 2 - img.height / 4,
+			img.width / 2, img.height / 2);
 	}
 	
 	//draw resize anchors on image corners;
@@ -216,14 +218,15 @@ jQuery(document).ready(function($){
 	function moveImage(x, y) {
 		var con = canv.getContext("2d"),
 			$i = $(userImg);
-		con.clearRect($i.data('x') - 1, $i.data('y') - 1, $i.data('w') + 1, $i.data('h') + 1);
+		con.clearRect($i.data('x') - 1, $i.data('y') - 1, $i.data('w') + 3, $i.data('h') + 3);
 		$i.data('x', $i.data('x') + x);
 		$i.data('y', $i.data('y') + y);
 		con.drawImage(userImg, $i.data('x'), $i.data('y'),
 				$i.data('w'), $i.data('h'));
 		drawAnchors(canv, $i);
 		drawCover();
-		console.log("userImg:", $i.data('x'), $i.data('y'));
+		console.log("userImg:", $i.data('x'), $i.data('y'), $i.data('w'), $i.data('h'));
+		console.log("coverImg:", img.width, img.height);
 
 	}
 
@@ -244,9 +247,12 @@ jQuery(document).ready(function($){
 	}
 
 	$(canv).bind("mouseover", function(e) {
-		if(clickedInImage(e, $(canv)[0], userImg)) {
+		if(clickedInImage(e, canv, userImg)) {
+			console.log("foo");
 			document.body.style.cursor = "pointer";
-		}
+		} else if(document.body.style.cursor == "pointer") {
+			document.body.style.cursor = "normal";
+		};
 	}).bind("mouseout", function(e) {
 		document.body.style.cursor = "normal";
 		$(this).unbind("mousemove", null);
@@ -312,12 +318,30 @@ jQuery(document).ready(function($){
 
 	$("#download").click(function(e) {
 		e.preventDefault();
-		var con = imgCanv.getContext("2d");
+		var con = imgCanv.getContext("2d"),
+			w = $(userImg).data('w'), h = $(userImg).data('h'),
+			wRatio = userImg.width / w,
+			hRatio = userImg.height / h,
+			covX = $(canv).width() / 2 - img.width / 4,
+			covY = $(canv).height() / 2 - img.height / 4,
+			imgX = $(userImg).data('x'), imgY = $(userImg).data('y');
+			
+		console.log("wRatio:", wRatio, "hRatio:", hRatio);
 		con.clearRect(0, 0, img.width, img.height);
-		con.drawImage(canv, $(canv).width() / 2 - img.width / 2,
+		console.log((imgX - covX) * wRatio,
+				(imgY - covY) * hRatio,
+				img.width / (2 / wRatio),
+				img.height / (2 / hRatio));
+		con.drawImage(userImg, -(imgX - covX) * wRatio,
+				-(imgY - covY) * hRatio,
+				img.width / (2 / wRatio),
+				img.height / (2 / hRatio),
+				0, 0, img.width, img.height);
+		/*con.drawImage(canv, $(canv).width() / 2 - img.width / 2,
 				$(canv).height() / 2 - img.height / 2,
 				img.width, img.height,
-				0, 0, img.width, img.height);
+				0, 0, img.width, img.height);*/
+		con.drawImage(img, 0, 0);
 		Canvas2Image.saveAsJPEG(imgCanv);
 	});
 
