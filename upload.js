@@ -100,11 +100,14 @@ jQuery(document).ready(function($){
 
 	$(img).bind('load', function() {
 
-		var cont = canv.getContext("2d");
-		cont.drawImage(img, $(canv).width() / 2 - img.width / 4,
-		   	$(canv).height() / 2 - img.height / 4,
+		var cont = canv.getContext("2d"),
+			x =  $(canv).width() / 2 - img.width / 4,
+   			y = $(canv).height() / 2 - img.height / 4;
+		cont.drawImage(img, x, y,
 			img.width / 2, img.height / 2);
 		console.log("test");
+		$(img).data('x', x)
+			.data('y', y);
 		imgCanv.width = img.width;
 		imgCanv.height = img.height;
 	});
@@ -227,6 +230,7 @@ jQuery(document).ready(function($){
 		drawCover();
 		console.log("userImg:", $i.data('x'), $i.data('y'), $i.data('w'), $i.data('h'));
 		console.log("coverImg:", img.width, img.height);
+		drawTriangles(1, canv, img);
 
 	}
 
@@ -244,6 +248,17 @@ jQuery(document).ready(function($){
 		drawAnchors(canv, $i);
 		drawCover();
 
+	}
+
+	function drawTriangles(no, canv, img) {
+		var con = canv.getContext("2d");
+		img = img.jquery ? img : $(img);
+
+		con.beginPath();
+		con.moveTo(img.data('x') + 98, img.data('y') + 128);
+		con.lineTo(img.data('x') + 58, img.data('y') + 197);
+		con.lineTo(img.data('x') + 136, img.data('y') + 197);
+		con.fill();
 	}
 
 	$(canv).bind("mouseover", function(e) {
