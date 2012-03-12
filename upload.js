@@ -332,15 +332,14 @@ jQuery(document).ready(function($){
 				(imgY - covY) * hRatio,
 				img.width / (2 / wRatio),
 				img.height / (2 / hRatio));
-		con.drawImage(userImg, -(imgX - covX) * wRatio,
-				-(imgY - covY) * hRatio,
-				img.width / (2 / wRatio),
-				img.height / (2 / hRatio),
+		con.drawImage(userImg, 
+			(imgX - covX) < 0 ? -(imgX - covX) * wRatio : 0,
+			(imgY - covY) < 0 ? -(imgY - covY) * hRatio : 0,
+			(imgX - covX) < 0 ? img.width / (2 / wRatio) 
+			: img.width / (2 / wRatio) - (imgX-covX) * wRatio,
+			(imgY - covY) < 0 ? img.height / (2 / hRatio)
+			: img.width / (2/ hRatio) - (imgY - covY) * hRatio,
 				0, 0, img.width, img.height);
-		/*con.drawImage(canv, $(canv).width() / 2 - img.width / 2,
-				$(canv).height() / 2 - img.height / 2,
-				img.width, img.height,
-				0, 0, img.width, img.height);*/
 		con.drawImage(img, 0, 0);
 		Canvas2Image.saveAsJPEG(imgCanv);
 	});
