@@ -4,7 +4,8 @@ jQuery(document).ready(function($){
 		imgCanv = document.createElement('canvas'), // this will be the downloaded image
 		userImg = new Image(),
 		dragListener,
-		dim = 18;
+		dim = 18,
+		ratio = 2;
 	
 
    	canv.width = window.innerWidth;
@@ -51,24 +52,26 @@ jQuery(document).ready(function($){
 			newImg.file = file;
 
 		reader.onload = (function(aImg) {return function(e) {
-				var x, y, w, h, ratio, portrait;
+				var x, y, w, h, portrait;
 				aImg.src = e.target.result;
+				console.log(aImg.width, aImg.height, window.innerWidth, window.innerHeight);
 				cont.clearRect(0, 0, $(canv).data('w'), $(canv).data('h'));
 				if(aImg.width / 2 <= $(canv).data('w') && aImg.height  / 2 <= $(canv).data('h')) {
 					x =  $(canv).data('w') / 2 - aImg.width / 4;
 					y = $(canv).data('h')  / 2 - aImg.height / 4;
 					w = aImg.width / 2, h = aImg.height / 2;
 					cont.drawImage(aImg,x, y, w, h);
-				} else if(aImg.width / 2 <= $(canv).data('w')) {
+				} else if(aImg.height / 2 >= $(canv).data('h')) {
 					ratio = aImg.height / $(canv).data('h');
-					w = aImg.width / ratio * 2, h = $(canv).data('h');
-					x =  $(canv).data('w') / 2 - w / 4;
+					w = aImg.width / ratio, h = $(canv).data('h');
+					x = $(canv).data('w') / 2 - w / 2;
 					y = 0;
-				} else if(aImg.height / 2 <= $(canv).data('h')) {
+					console.log(ratio, w, h, aImg.width, aImg.height);
+				} else if(aImg.width / 2 >= $(canv).data('w')) {
 					ratio = aImg.width / $(canv).data('w');
-					w = aImg.width, h = aImg.height * ratio / 2;
+					w = aImg.width, h = aImg.height * ratio ;
 					x =  0;
-					y =  $(canv).data('h') / 2 - h / 4;
+					y =  $(canv).data('h') / 2 - h / 2;
 				} else {
 					portrait = (aImg.width / aImg.height <= $(canv).data('w') / $(canv).data('h'));
 					if(portrait) {
@@ -83,13 +86,13 @@ jQuery(document).ready(function($){
 					x = $(canv).data('w') / 2 - w / 4;
 					y = $(canv).data('h') / 2 - h / 4;
 				}
-				cont.drawImage(aImg,x, y, w, h);
+				cont.drawImage(aImg, Math.floor(x), Math.floor(y), Math.floor(w), Math.floor(h));
 				userImg = aImg;
 				$(userImg)
-					.data('x',x)
-					.data('y',y)
-					.data('w', w)
-					.data('h', h);
+					.data('x', Math.floor(x))
+					.data('y', Math.floor(y))
+					.data('w', Math.floor(w))
+					.data('h', Math.floor(h));
 				drawAnchors(canv, $(userImg));
 				drawCover();
 			}; 
@@ -220,7 +223,14 @@ jQuery(document).ready(function($){
 	//what it says it does
 	function moveImage(x, y) {
 		var con = canv.getContext("2d"),
-			$i = $(userImg);
+			$i = $(userImg),
+			w = $(userImg).data('w'), h = $(userImg).data('h'),
+			wRatio = userImg.width / w,
+			hRatio = userImg.height / h,
+			covX = $(canv).width() / 2 - img.width / 4,
+			covY = $(canv).height() / 2 - img.height / 4,
+			imgX = $(userImg).data('x'), imgY = $(userImg).data('y');
+
 		con.clearRect($i.data('x') - 1, $i.data('y') - 1, $i.data('w') + 3, $i.data('h') + 3);
 		$i.data('x', $i.data('x') + x);
 		$i.data('y', $i.data('y') + y);
@@ -332,6 +342,7 @@ jQuery(document).ready(function($){
 	});
 
 	$("#download").click(function(e) {
+		e.stopPropagation();
 		e.preventDefault();
 		var con = imgCanv.getContext("2d"),
 			w = $(userImg).data('w'), h = $(userImg).data('h'),
@@ -339,23 +350,37 @@ jQuery(document).ready(function($){
 			hRatio = userImg.height / h,
 			covX = $(canv).width() / 2 - img.width / 4,
 			covY = $(canv).height() / 2 - img.height / 4,
-			imgX = $(userImg).data('x'), imgY = $(userImg).data('y');
+			imgX = $(userImg).data('x'), imgY = $(userImg).data('y'),
+			dx, dy, dw, dh, sx, sy, sw, sh;
+
+		
 			
 		console.log("wRatio:", wRatio, "hRatio:", hRatio);
 		con.clearRect(0, 0, img.width, img.height);
-		console.log((imgX - covX) * wRatio,
-				(imgY - covY) * hRatio,
-				img.width / (2 / wRatio),
-				img.height / (2 / hRatio));
+		con.fillStyle = "#fff";
+		con.fillRect(0, 0, img.width, img.height);
+		console.log((imgX - covX) < 0 ? - (imgX - covX) * wRatio : 0,
+			(imgY - covY) < 0 ? - (imgY - covY) * hRatio : 0,
+			img.width * (wRatio / 2),
+			img.height * (hRatio / 2),
+			(imgX - covX) > 0 ? (imgX - covX) * 2 : 0,
+			(imgY - covY) > 0 ? (imgY - covY) * 2 : 0,
+			(imgX - covX) < 0 ? img.width 
+			: (img.width - ((imgX - covX) * 2)),
+			(imgY - covY) < 0 ? img.height
+			:(img.height - ((imgY - covY) * 2)));
 		con.drawImage(userImg, 
-			(imgX - covX) < 0 ? -(imgX - covX) * wRatio : 0,
-			(imgY - covY) < 0 ? -(imgY - covY) * hRatio : 0,
-			(imgX - covX) < 0 ? img.width / (2 / wRatio) 
-			: img.width / (2 / wRatio) - (imgX-covX) * wRatio,
-			(imgY - covY) < 0 ? img.height / (2 / hRatio)
-			: img.width / (2/ hRatio) - (imgY - covY) * hRatio,
-				0, 0, img.width, img.height);
-		con.drawImage(img, 0, 0);
+			(imgX - covX) < 0 ? - (imgX - covX) * wRatio : 0,
+			(imgY - covY) < 0 ? - (imgY - covY) * hRatio : 0,
+			img.width * (wRatio / 2),
+			img.height * (hRatio / 2),
+			(imgX - covX) > 0 ? (imgX - covX) * 2 : 0,
+			(imgY - covY) > 0 ? (imgY - covY) * 2 : 0,
+			(imgX - covX) < 0 ? img.width 
+			: (img.width - ((imgX - covX) * 2)),
+			(imgY - covY) < 0 ? img.height
+			:(img.height - ((imgY - covY) * 2)));
+		con.drawImage(img, 0, 0, img.width, img.height);
 		Canvas2Image.saveAsJPEG(imgCanv);
 	});
 
