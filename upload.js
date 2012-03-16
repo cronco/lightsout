@@ -360,6 +360,7 @@ jQuery(document).ready(function($){
 		con.clearRect(0, 0, img.width, img.height);
 		con.fillStyle = "#fff";
 		con.fillRect(0, 0, img.width, img.height);
+
 		//if the image is to the left of the cover
 		if (imgX  < 0 || imgX - covX < 0) {
 			sx = - (imgX - covX) * wRatio;
@@ -368,8 +369,10 @@ jQuery(document).ready(function($){
 			//if it ends to the left too
 			if ((imgX + w) < (covX + covW)) {
 				dw = img.width - ((covW + covX) - (imgX + w) * 2);
+				sw = img.width - ((covX + covW) - (imgX + w)) * (wRatio / 2);
 			} else {
 				dw = img.width;
+				sw = img.width * (wRatio / 2);
 			}
 		} else {
 			sx = 0;
@@ -378,8 +381,11 @@ jQuery(document).ready(function($){
 			//if it ends to the left
 			if ((imgX + w) < (covX + covW)) {
 				dw = img.width - ((covW - w) * 2);
+				sw = w;
 			} else {
-				dw = img.width - (covX - imgX) * 2;
+				dw = img.width - (imgX - covX) * 2;
+				//sw = img.width - (imgX - covX) * (wRatio / 2);
+				sw = img.width - ((imgX - covX) + (imgH + w - covX - covW)) * (wRatio / 2);
 			}
 
 		}
@@ -390,9 +396,11 @@ jQuery(document).ready(function($){
 
 			//if it ends above too
 			if ((imgY + h) < (covY + covH)) {
-				dh = img.height - ((covH + covY) - (imgY + h) * 2);
+				dh = img.height - ((covH + covY) - (imgY + h)) * 2;
+				sh = img.height - ((covY + covH) - (imgY + h)) * (hRatio / 2); 
 			} else {
 				dh = img.height;
+				sh = img.height * (hRatio / 2);
 			}
 		} else {
 			sy = 0;
@@ -401,11 +409,14 @@ jQuery(document).ready(function($){
 			//if it ends above
 			if ((imgY + h) < (covY + covH)) {
 				dh = img.height - ((covH - h) * 2);
+				sh = h;
 			} else {
 				dh = img.height - ((imgY - covY) * 2);
+				//sh = img.height - ((covY + covH) - (imgY + h)) * (hRatio / 2); 
+				sh = img.height - ((imgY - covY) + (imgY + h - covY - covH)) * (hRatio / 2);
 			}
 		}
-
+/*
 		//if the image ends to the left of the cover
 		if ((imgX + w) < (covX + covW)) {
 			sw = Math.min(w * wRatio, (img.width - ((covX + covW) - (imgX + w))) * (wRatio / 2));
@@ -417,7 +428,7 @@ jQuery(document).ready(function($){
 		} else { 
 			sh = img.height * (hRatio / 2);
 		}
-
+*/
 		console.log(sx, sy, sw, sh, dx, dy, dw, dh);
 		con.drawImage(userImg, sx, sy, sw, sh, dx, dy, dw, dh);
 		con.drawImage(img, 0, 0, img.width, img.height);
