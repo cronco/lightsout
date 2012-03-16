@@ -345,42 +345,78 @@ jQuery(document).ready(function($){
 		e.preventDefault();
 		var con = imgCanv.getContext("2d"),
 			w = $(userImg).data('w'), h = $(userImg).data('h'),
+			imgX = $(userImg).data('x'), imgY = $(userImg).data('y'),
 			wRatio = userImg.width / w,
 			hRatio = userImg.height / h,
 			covX = $(canv).width() / 2 - img.width / 4,
 			covY = $(canv).height() / 2 - img.height / 4,
-			imgX = $(userImg).data('x'), imgY = $(userImg).data('y'),
+			covW = img.width / 2, covH = img.height / 2,
 			dx, dy, dw, dh, sx, sy, sw, sh;
 
 		
 			
+		console.log('image x %d, image y %d', imgX, imgY);
 		console.log("wRatio:", wRatio, "hRatio:", hRatio);
 		con.clearRect(0, 0, img.width, img.height);
 		con.fillStyle = "#fff";
 		con.fillRect(0, 0, img.width, img.height);
 		//if the image is to the left of the cover
-		if (imgX - covX < 0) {
+		if (imgX  < 0 || imgX - covX < 0) {
 			sx = - (imgX - covX) * wRatio;
 			dx = 0;
-			dw = img.width;
+
+			//if it ends to the left too
+			if ((imgX + w) < (covX + covW)) {
+				dw = img.width - ((covW + covX) - (imgX + w) * 2);
+			} else {
+				dw = img.width;
+			}
 		} else {
 			sx = 0;
 			dx = (imgX - covX) * 2;
-			dw = img.width - ((imgX - covX) * 2);
+
+			//if it ends to the left
+			if ((imgX + w) < (covX + covW)) {
+				dw = img.width - ((covW - w) * 2);
+			} else {
+				dw = img.width - (covX - imgX) * 2;
+			}
 
 		}
 		//if the image is above the cover
-		if(imgY - covY < 0) {
+		if(imgY < 0 || imgY - covY < 0) {
 			sy = - (imgY - covY) * wRatio;
 			dy = 0;
-			dh = img.height;
+
+			//if it ends above too
+			if ((imgY + h) < (covY + covH)) {
+				dh = img.height - ((covH + covY) - (imgY + h) * 2);
+			} else {
+				dh = img.height;
+			}
 		} else {
 			sy = 0;
 			dy = (imgY - covY) * 2;
-			dh = img.height - ((imgY - covY) * 2);
+
+			//if it ends above
+			if ((imgY + h) < (covY + covH)) {
+				dh = img.height - ((covH - h) * 2);
+			} else {
+				dh = img.height - ((imgY - covY) * 2);
+			}
 		}
-		sw = img.width * (wRatio / 2);
-		sh = img.height * (hRatio / 2);
+
+		//if the image ends to the left of the cover
+		if ((imgX + w) < (covX + covW)) {
+			sw = Math.min(w * wRatio, (img.width - ((covX + covW) - (imgX + w))) * (wRatio / 2));
+		} else { 
+			sw = img.width * (wRatio / 2);
+		}
+		if ((imgY + h) < (covY + covH)) {
+			sh = Math.min(h * hRatio, (img.height - ((covY + covH) - (imgY + h))) * (hRatio / 2));
+		} else { 
+			sh = img.height * (hRatio / 2);
+		}
 
 		console.log(sx, sy, sw, sh, dx, dy, dw, dh);
 		con.drawImage(userImg, sx, sy, sw, sh, dx, dy, dw, dh);
