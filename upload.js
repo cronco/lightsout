@@ -239,7 +239,6 @@ jQuery(document).ready(function($){
 		drawAnchors(canv, $i);
 		drawCover();
 		console.log("userImg:", $i.data('x'), $i.data('y'), $i.data('w'), $i.data('h'));
-		console.log("coverImg:", img.width, img.height);
 		drawTriangles(1, canv, img);
 
 	}
@@ -359,27 +358,32 @@ jQuery(document).ready(function($){
 		con.clearRect(0, 0, img.width, img.height);
 		con.fillStyle = "#fff";
 		con.fillRect(0, 0, img.width, img.height);
-		console.log((imgX - covX) < 0 ? - (imgX - covX) * wRatio : 0,
-			(imgY - covY) < 0 ? - (imgY - covY) * hRatio : 0,
-			img.width * (wRatio / 2),
-			img.height * (hRatio / 2),
-			(imgX - covX) > 0 ? (imgX - covX) * 2 : 0,
-			(imgY - covY) > 0 ? (imgY - covY) * 2 : 0,
-			(imgX - covX) < 0 ? img.width 
-			: (img.width - ((imgX - covX) * 2)),
-			(imgY - covY) < 0 ? img.height
-			:(img.height - ((imgY - covY) * 2)));
-		con.drawImage(userImg, 
-			(imgX - covX) < 0 ? - (imgX - covX) * wRatio : 0,
-			(imgY - covY) < 0 ? - (imgY - covY) * hRatio : 0,
-			img.width * (wRatio / 2),
-			img.height * (hRatio / 2),
-			(imgX - covX) > 0 ? (imgX - covX) * 2 : 0,
-			(imgY - covY) > 0 ? (imgY - covY) * 2 : 0,
-			(imgX - covX) < 0 ? img.width 
-			: (img.width - ((imgX - covX) * 2)),
-			(imgY - covY) < 0 ? img.height
-			:(img.height - ((imgY - covY) * 2)));
+		//if the image is to the left of the cover
+		if (imgX - covX < 0) {
+			sx = - (imgX - covX) * wRatio;
+			dx = 0;
+			dw = img.width;
+		} else {
+			sx = 0;
+			dx = (imgX - covX) * 2;
+			dw = img.width - ((imgX - covX) * 2);
+
+		}
+		//if the image is above the cover
+		if(imgY - covY < 0) {
+			sy = - (imgY - covY) * wRatio;
+			dy = 0;
+			dh = img.height;
+		} else {
+			sy = 0;
+			dy = (imgY - covY) * 2;
+			dh = img.height - ((imgY - covY) * 2);
+		}
+		sw = img.width * (wRatio / 2);
+		sh = img.height * (hRatio / 2);
+
+		console.log(sx, sy, sw, sh, dx, dy, dw, dh);
+		con.drawImage(userImg, sx, sy, sw, sh, dx, dy, dw, dh);
 		con.drawImage(img, 0, 0, img.width, img.height);
 		Canvas2Image.saveAsJPEG(imgCanv);
 	});
