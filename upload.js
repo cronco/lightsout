@@ -363,36 +363,30 @@ jQuery(document).ready(function($){
 
 		//if the image is to the left of the cover
 		if (imgX  < 0 || imgX - covX < 0) {
-			console.log('starts at the left');
 			sx = - (imgX - covX) * wRatio;
 			dx = 0;
 
 			//if it ends to the left too
 			if ((imgX + w) < (covX + covW)) {
 
-				console.log('ends at the left');
 				dw = img.width - ((covW + covX) - (imgX + w)) * 2;
 				sw = (covW - ((covX + covW) - (imgX + w))) * wRatio;
 			} else {
 				
-				console.log('ends at the right');
 				dw = img.width;
 				sw = img.width * (wRatio / 2);
 			}
 		} else {
 
-			console.log('starts at the right');
 			sx = 0;
 			dx = (imgX - covX) * 2;
 
 			//if it ends to the left
 			if ((imgX + w) < (covX + covW)) {
 
-				console.log('ends at the left');
 				dw = img.width - ((covW - w) * 2);
 				sw = userImg.width;
 			} else {
-				console.log('ends at the right');
 				dw = img.width - (imgX - covX) * 2;
 				sw = (covW - (imgX - covX)) * wRatio;
 			}
@@ -400,19 +394,16 @@ jQuery(document).ready(function($){
 		}
 		//if the image is above the cover
 		if(imgY < 0 || imgY - covY < 0) {
-			console.log('starts above');
 			sy = - (imgY - covY) * hRatio;
 			dy = 0;
 
 			//if it ends above too
 			if ((imgY + h) < (covY + covH)) {
 
-				console.log('ends above');
 				dh = img.height - ((covH + covY) - (imgY + h)) * 2;
 				sh = (covH - ((covY + covH) - (imgY + h))) * hRatio; 
 
 			} else {
-				console.log('ends below');
 				dh = img.height;
 				sh = img.height * (hRatio / 2);
 			}
@@ -423,29 +414,13 @@ jQuery(document).ready(function($){
 
 			//if it ends above
 			if ((imgY + h) < (covY + covH)) {
-				console.log('ends above');
 				dh = img.height - ((covH - h) * 2);
 				sh = userImg.height;
 			} else {
-				console.log('ends below');
 				dh = img.height - ((imgY - covY) * 2);
-				//sh = (img.height - ((imgY - covY) + ((covY + covH) - (imgY + h)))) * (hRatio / 2);
 				sh = (covW - (imgY - covY)) * hRatio;
 			}
 		}
-/*
-		//if the image ends to the left of the cover
-		if ((imgX + w) < (covX + covW)) {
-			sw = Math.min(w * wRatio, (img.width - ((covX + covW) - (imgX + w))) * (wRatio / 2));
-		} else { 
-			sw = img.width * (wRatio / 2);
-		}
-		if ((imgY + h) < (covY + covH)) {
-			sh = Math.min(h * hRatio, (img.height - ((covY + covH) - (imgY + h))) * (hRatio / 2));
-		} else { 
-			sh = img.height * (hRatio / 2);
-		}
-*/
 		console.log(sx, sy, sw, sh, dx, dy, dw, dh);
 		con.drawImage(userImg, sx, sy, sw, sh, dx, dy, dw, dh);
 		con.drawImage(img, 0, 0, img.width, img.height);
