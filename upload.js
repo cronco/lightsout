@@ -363,57 +363,74 @@ jQuery(document).ready(function($){
 
 		//if the image is to the left of the cover
 		if (imgX  < 0 || imgX - covX < 0) {
+			console.log('starts at the left');
 			sx = - (imgX - covX) * wRatio;
 			dx = 0;
 
 			//if it ends to the left too
 			if ((imgX + w) < (covX + covW)) {
-				dw = img.width - ((covW + covX) - (imgX + w) * 2);
-				sw = img.width - ((covX + covW) - (imgX + w)) * (wRatio / 2);
+
+				console.log('ends at the left');
+				dw = img.width - ((covW + covX) - (imgX + w)) * 2;
+				sw = (covW - ((covX + covW) - (imgX + w))) * wRatio;
 			} else {
+				
+				console.log('ends at the right');
 				dw = img.width;
 				sw = img.width * (wRatio / 2);
 			}
 		} else {
+
+			console.log('starts at the right');
 			sx = 0;
 			dx = (imgX - covX) * 2;
 
 			//if it ends to the left
 			if ((imgX + w) < (covX + covW)) {
+
+				console.log('ends at the left');
 				dw = img.width - ((covW - w) * 2);
-				sw = w;
+				sw = userImg.width;
 			} else {
+				console.log('ends at the right');
 				dw = img.width - (imgX - covX) * 2;
-				//sw = img.width - (imgX - covX) * (wRatio / 2);
-				sw = img.width - ((imgX - covX) + (imgH + w - covX - covW)) * (wRatio / 2);
+				sw = (covW - (imgX - covX)) * wRatio;
 			}
 
 		}
 		//if the image is above the cover
 		if(imgY < 0 || imgY - covY < 0) {
-			sy = - (imgY - covY) * wRatio;
+			console.log('starts above');
+			sy = - (imgY - covY) * hRatio;
 			dy = 0;
 
 			//if it ends above too
 			if ((imgY + h) < (covY + covH)) {
+
+				console.log('ends above');
 				dh = img.height - ((covH + covY) - (imgY + h)) * 2;
-				sh = img.height - ((covY + covH) - (imgY + h)) * (hRatio / 2); 
+				sh = (covH - ((covY + covH) - (imgY + h))) * hRatio; 
+
 			} else {
+				console.log('ends below');
 				dh = img.height;
 				sh = img.height * (hRatio / 2);
 			}
 		} else {
+			console.log('starts below');
 			sy = 0;
 			dy = (imgY - covY) * 2;
 
 			//if it ends above
 			if ((imgY + h) < (covY + covH)) {
+				console.log('ends above');
 				dh = img.height - ((covH - h) * 2);
-				sh = h;
+				sh = userImg.height;
 			} else {
+				console.log('ends below');
 				dh = img.height - ((imgY - covY) * 2);
-				//sh = img.height - ((covY + covH) - (imgY + h)) * (hRatio / 2); 
-				sh = img.height - ((imgY - covY) + (imgY + h - covY - covH)) * (hRatio / 2);
+				//sh = (img.height - ((imgY - covY) + ((covY + covH) - (imgY + h)))) * (hRatio / 2);
+				sh = (covW - (imgY - covY)) * hRatio;
 			}
 		}
 /*
