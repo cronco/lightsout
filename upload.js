@@ -12,6 +12,8 @@ jQuery(document).ready(function($){
 	canv.height = window.innerHeight;
 	$(canv).data('w', canv.width)
 			.data('h', canv.height);
+	console.log('canvas width %s, height %s', $(canv).data('w'),
+			$(canv).data('h'));
 	$(userImg).data('x', 0)
 			.data('y', 0);
 
@@ -45,7 +47,7 @@ jQuery(document).ready(function($){
 		for (i = 0; i < files.length; i++) {  
 			file = files[i];  
 			if (!file.type.match(imageType)) {  
-			  continue;  
+			  continue; 
 			}  
 			  
 			console.log(file.name, file.type);
@@ -66,7 +68,6 @@ jQuery(document).ready(function($){
 					w = aImg.width / ratio, h = $(canv).data('h');
 					x = $(canv).data('w') / 2 - w / 2;
 					y = 0;
-					console.log(ratio, w, h, aImg.width, aImg.height);
 				} else if(aImg.width / 2 >= $(canv).data('w')) {
 					ratio = aImg.width / $(canv).data('w');
 					w = aImg.width, h = aImg.height * ratio ;
@@ -113,6 +114,32 @@ jQuery(document).ready(function($){
 			.data('y', y);
 		imgCanv.width = img.width;
 		imgCanv.height = img.height;
+	});
+
+	$(window).resize(function(e) {
+		var ow = $(canv).data('w'),
+			oh = $(canv).data('h'),
+			dx, dy; //how much we have to move the cover and the image.
+		canv.width = window.innerWidth;
+		canv.height = window.innerHeight;
+
+		dw = (canv.width - ow) / 2;
+		dh = (canv.height - oh) / 2;
+		$(canv).data('w', canv.width)
+				.data('h', canv.height);
+		console.log('canvas width %s, height %s', $(canv).data('w'),
+			$(canv).data('h'));
+
+		console.log(dw, dh);
+
+		if(userImg.src) {
+			moveImage(dw, dh);
+		} else {
+			drawCover();
+		}
+
+
+
 	});
 
 	img.src = "cover.png";
