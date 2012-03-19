@@ -291,6 +291,7 @@ jQuery(document).ready(function($){
 		img = img.jquery ? img : $(img);
 
 		con.beginPath();
+		con.globalCompositionOperation = "lighter";
 		con.moveTo(img.data('x') + 98, img.data('y') + 128);
 		con.lineTo(img.data('x') + 58, img.data('y') + 197);
 		con.lineTo(img.data('x') + 136, img.data('y') + 197);
