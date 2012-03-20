@@ -6,15 +6,93 @@ jQuery(document).ready(function($){
 		dragListener,
 		dim = 18,
 		ratio = 2,
-		steps = 5000,
-		step = 0;
+		steps = 700,
+		step = 0,
+		movingImg,
+		started = false,
+		triangles,
 		requestAnimationFrame = window.requestAnimationFrame 
 					|| window.mozRequestAnimationFrame 
 					||  window.webkitRequestAnimationFrame 
-					|| window.msRequestAnimationFrame;  
-  
-		var start = window.mozAnimationStartTime;  // Only supported in FF. Other browsers can use something like Date.now(). 
+					|| window.msRequestAnimationFrame,
+	  start = window.mozAnimationStartTime;  // Only supported in FF. Other browsers can use something like Date.now(). 
 	
+	triangles = [
+		{},
+		{ 
+			x1: 98,
+			y1: 128,
+			x2: 58,
+			y2: 196,
+			x3: 136,
+			y3: 196,
+			animated: false
+		},
+		{ 
+			x1: 58,
+			y1: 203,
+			x2: 136,
+			y2: 203,
+			x3: 97,
+			y3: 270,
+			animated: false
+		},
+		{ 
+			x1: 104,
+			y1: 270,
+			x2: 181,
+			y2: 270,
+			x3: 143,
+			y3: 205,
+			animated: false
+		},
+		{ 
+			x1: 229,
+			y1: 129,
+			x2: 306,
+			y2: 129,
+			x3: 268,
+			y3: 196,
+			animated: false
+		},
+		{ 
+			x1: 223,
+			y1: 129,
+			x2: 183,
+			y2: 196,
+			x3: 262,
+			y3: 196,
+			animated: false
+		},
+		{ 
+			x1: 183,
+			y1: 203,
+			x2: 262,
+			y2: 203,
+			x3: 222,
+			y3: 271,
+			animated: false
+		},
+		{ 
+			x1: 268,
+			y1: 204,
+			x2: 229,
+			y2: 270,
+			x3: 306,
+			y3: 270,
+			animated: false
+		},
+		{ 
+			x1: 313,
+			y1: 270,
+			x2: 273,
+			y2: 203,
+			x3: 351,
+			y3: 203,
+			animated: false
+		},
+		
+	];
 
    	canv.width = window.innerWidth;
 	canv.height = window.innerHeight;
@@ -123,6 +201,7 @@ jQuery(document).ready(function($){
 		imgCanv.width = img.width;
 		imgCanv.height = img.height;
 	});
+	img.src = "cover.png";
 
 	$(window).resize(function(e) {
 		var ow = $(canv).data('w'),
@@ -133,10 +212,7 @@ jQuery(document).ready(function($){
 
 		dw = (canv.width - ow) / 2;
 		dh = (canv.height - oh) / 2;
-		$(canv).data('w', canv.width)
-				.data('h', canv.height);
-		console.log('canvas width %s, height %s', $(canv).data('w'),
-			$(canv).data('h'));
+		$(canv).data('w', canv.width).data('h', canv.height);
 
 		console.log(dw, dh);
 
@@ -146,18 +222,16 @@ jQuery(document).ready(function($){
 			drawCover();
 		}
 
-
-
 	});
 
-	img.src = "cover.png";
-
+	//draws the cover and updates its' coordinates
 	function drawCover() {
 
-		var cont = canv.getContext("2d");
-		cont.drawImage(img, $(canv).width() / 2 - img.width / 4,
-		   	$(canv).height() / 2 - img.height / 4,
-			img.width / 2, img.height / 2);
+		var cont = canv.getContext("2d"), x, y;
+			x = $(canv).width() / 2 - img.width / 4;
+			y = $(canv).height() / 2 - img.height / 4;
+		cont.drawImage(img, x, y, img.width / 2, img.height / 2);
+		$(img).data('x', x).data('y', y);
 	}
 	
 	//draw resize anchors on image corners;
@@ -259,12 +333,7 @@ jQuery(document).ready(function($){
 	function moveImage(x, y) {
 		var con = canv.getContext("2d"),
 			$i = $(userImg),
-			w = $(userImg).data('w'), h = $(userImg).data('h'),
-			wRatio = userImg.width / w,
-			hRatio = userImg.height / h,
-			covX = $(canv).width() / 2 - img.width / 4,
-			covY = $(canv).height() / 2 - img.height / 4,
-			imgX = $(userImg).data('x'), imgY = $(userImg).data('y');
+			w = $(userImg).data('w'), h = $(userImg).data('h');
 
 		con.clearRect($i.data('x') - 1, $i.data('y') - 1, $i.data('w') + 3, $i.data('h') + 3);
 		$i.data('x', $i.data('x') + x);
@@ -274,7 +343,7 @@ jQuery(document).ready(function($){
 		drawAnchors(canv, $i);
 		drawCover();
 		console.log("userImg:", $i.data('x'), $i.data('y'), $i.data('w'), $i.data('h'));
-		startDrawingTriangles(1, canv, img);
+		//startDrawingTriangles(1, canv, img);
 
 	}
 
@@ -294,41 +363,90 @@ jQuery(document).ready(function($){
 
 	}
 
+	//returns a number between 1 and 8 if the mouse moved between one of the triangles
+	//or null otherwise
+	function clickedInTriangles(e) {
+		var con = canv.getContext("2d"),
+			cov = img.jquery ? img : $(img),
+			x, y;
+		con.moveTo(cov.data('x') + 98, cov.data('y') + 128);
+		con.lineTo(cov.data('x') + 58, cov.data('y') + 197);
+		con.lineTo(cov.data('x') + 136, cov.data('y') + 197);
+
+		
+		//get canvas size and position;
+		bb = canv.getBoundingClientRect();
+
+		//convert global mouse coordinates to canvas coordinates;
+
+		x = (e.clientX - bb.left) * (canv.width / bb.width);
+		y = (e.clientY - bb.top) * (canv.height / bb.height);
+		//console.log(x,y);
+
+		if(con.isPointInPath(x, y)) {
+			return 1;
+		}
+	}
+
 	function startDrawingTriangles(no) {
+		started = true;
 		start = window.mozAnimationStartTime;
 		requestAnimationFrame(drawTriangles);
 	}
+
 	function drawTriangles(timestamp) {
 		var con = canv.getContext("2d"),
 		progress = timestamp - start,
-		cov = img.jquery ? img : $(img);
+		cov = $(img),
+		w = $(canv).data('w'),
+		h = $(canv).data('h');
 		
 
+		
 		if(progress < steps) {
-			con.beginPath();
+			//con.clearRect(0, 0, $(canv).data('w'), $(canv).data('h'));
+			if(userImg.src) {
+				moveImage(0, 0);
+			} else {
+				con.clearRect(0, 0 , w, h);
+				drawCover();
+			}
 			con.save();
-			con.globalCompositionOperation = "lighter";
-			con.globalAlpha = progress / steps;
+			con.beginPath();
+			con.fillStyle = "#fff";
+			//con.globalCompositionOperation = "destination-atop";
+			if( progress < steps / 4) {
+				con.globalAlpha = (progress / steps) *3;
+			} else {
+				con.globalAlpha = (steps - progress) / steps;
+			}
 			
 			con.moveTo(cov.data('x') + 98, cov.data('y') + 128);
 			con.lineTo(cov.data('x') + 58, cov.data('y') + 197);
 			con.lineTo(cov.data('x') + 136, cov.data('y') + 197);
+			con.closePath();
 			con.fill();
 			con.restore();
 			requestAnimationFrame(drawTriangles);
+		} else {
+			started = false;
 		}
 	}
 
-	$(canv).bind("mouseover", function(e) {
-		if(clickedInImage(e, canv, userImg)) {
-			console.log("foo");
+
+	$(canv).bind("mousemove", function(e) {
+		if(clickedInTriangles(e)) {
+			if(!started) {
+				startDrawingTriangles();
+			}
+		} else if(clickedInImage(e, canv, userImg)) {
 			document.body.style.cursor = "pointer";
-		} else if(document.body.style.cursor == "pointer") {
+		}  else  if(document.body.style.cursor == "pointer") {
 			document.body.style.cursor = "normal";
-		};
+		}
 	}).bind("mouseout", function(e) {
 		document.body.style.cursor = "normal";
-		$(this).unbind("mousemove", null);
+		//$(this).unbind("mousemove", movingImg);
 	}).bind("mousedown", function(e) {
 		var mouseX = e.clientX,
 			mouseY = e.clientY,
@@ -386,7 +504,8 @@ jQuery(document).ready(function($){
 
 		}).bind("mouseup", function(e) {
 
-			$(this).unbind("mousemove", null);
+			$(this).unbind("mousemove", resizeListener);
+			$(this).unbind("mousemove", dragListener);
 	});
 
 	$("#download").click(function(e) {
