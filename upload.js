@@ -368,33 +368,38 @@ jQuery(document).ready(function($){
 	function clickedInTriangles(e) {
 		var con = canv.getContext("2d"),
 			cov = img.jquery ? img : $(img),
-			x, y;
-		con.moveTo(cov.data('x') + 98, cov.data('y') + 128);
-		con.lineTo(cov.data('x') + 58, cov.data('y') + 197);
-		con.lineTo(cov.data('x') + 136, cov.data('y') + 197);
-
+			x, y, i;
 		
 		//get canvas size and position;
 		bb = canv.getBoundingClientRect();
 
 		//convert global mouse coordinates to canvas coordinates;
-
 		x = (e.clientX - bb.left) * (canv.width / bb.width);
 		y = (e.clientY - bb.top) * (canv.height / bb.height);
-		//console.log(x,y);
 
-		if(con.isPointInPath(x, y)) {
-			return 1;
+		for (i = 1; i < triangles.length; i++) {
+			con.beginPath();
+			con.moveTo(cov.data('x') + triangles[i]['x1'], cov.data('y') + triangles[i]['y1']);
+			con.lineTo(cov.data('x') + triangles[i]['x2'], cov.data('y') + triangles[i]['y2']);
+			con.lineTo(cov.data('x') + triangles[i]['x3'], cov.data('y') + triangles[i]['y3']);
+
+			if(con.isPointInPath(x, y)) {
+				return i;
+			}
 		}
+		return null;
+		
 	}
 
-	function startDrawingTriangles(no) {
-		started = true;
+	function startDrawingTriangles(triangleNo) {
+		triangles[triangleNo]['animated'] = true;
 		start = window.mozAnimationStartTime;
-		requestAnimationFrame(drawTriangles);
+		requestAnimationFrame(function(timestamp){
+			drawTriangles(timestamp, triangleNo);
+		});
 	}
 
-	function drawTriangles(timestamp) {
+	function drawTriangles(timestamp, triangleNo) {
 		var con = canv.getContext("2d"),
 		progress = timestamp - start,
 		cov = $(img),
@@ -416,28 +421,33 @@ jQuery(document).ready(function($){
 			con.fillStyle = "#fff";
 			//con.globalCompositionOperation = "destination-atop";
 			if( progress < steps / 4) {
-				con.globalAlpha = (progress / steps) *3;
+				con.globalAlpha = (progress / steps) * 3;
 			} else {
 				con.globalAlpha = (steps - progress) / steps;
 			}
 			
-			con.moveTo(cov.data('x') + 98, cov.data('y') + 128);
-			con.lineTo(cov.data('x') + 58, cov.data('y') + 197);
-			con.lineTo(cov.data('x') + 136, cov.data('y') + 197);
+			con.moveTo(cov.data('x') + triangles[triangleNo]['x1'],
+				   	cov.data('y') + triangles[triangleNo]['y1']);
+			con.lineTo(cov.data('x') + triangles[triangleNo].x2, cov.data('y') + triangles[triangleNo].y2);
+			con.lineTo(cov.data('x') + triangles[triangleNo].x3, cov.data('y') + triangles[triangleNo].y3);
 			con.closePath();
 			con.fill();
 			con.restore();
-			requestAnimationFrame(drawTriangles);
+			requestAnimationFrame(function(timestamp) {
+				drawTriangles(timestamp, triangleNo);
+			});
 		} else {
-			started = false;
+			triangles[triangleNo]['animated'] = false;
 		}
 	}
 
 
 	$(canv).bind("mousemove", function(e) {
-		if(clickedInTriangles(e)) {
-			if(!started) {
-				startDrawingTriangles();
+		var triangle = clickedInTriangles(e);
+		if(triangle) {
+			console.log(triangle);
+			if(!triangles[triangle]['animated']) {
+				startDrawingTriangles(triangle);
 			}
 		} else if(clickedInImage(e, canv, userImg)) {
 			document.body.style.cursor = "pointer";
