@@ -5,7 +5,15 @@ jQuery(document).ready(function($){
 		userImg = new Image(),
 		dragListener,
 		dim = 18,
-		ratio = 2;
+		ratio = 2,
+		steps = 5000,
+		step = 0;
+		requestAnimationFrame = window.requestAnimationFrame 
+					|| window.mozRequestAnimationFrame 
+					||  window.webkitRequestAnimationFrame 
+					|| window.msRequestAnimationFrame;  
+  
+		var start = window.mozAnimationStartTime;  // Only supported in FF. Other browsers can use something like Date.now(). 
 	
 
    	canv.width = window.innerWidth;
@@ -266,7 +274,7 @@ jQuery(document).ready(function($){
 		drawAnchors(canv, $i);
 		drawCover();
 		console.log("userImg:", $i.data('x'), $i.data('y'), $i.data('w'), $i.data('h'));
-		drawTriangles(1, canv, img);
+		startDrawingTriangles(1, canv, img);
 
 	}
 
@@ -286,16 +294,29 @@ jQuery(document).ready(function($){
 
 	}
 
-	function drawTriangles(no, canv, img) {
-		var con = canv.getContext("2d");
-		img = img.jquery ? img : $(img);
+	function startDrawingTriangles(no) {
+		start = window.mozAnimationStartTime;
+		requestAnimationFrame(drawTriangles);
+	}
+	function drawTriangles(timestamp) {
+		var con = canv.getContext("2d"),
+		progress = timestamp - start,
+		cov = img.jquery ? img : $(img);
+		
 
-		con.beginPath();
-		con.globalCompositionOperation = "lighter";
-		con.moveTo(img.data('x') + 98, img.data('y') + 128);
-		con.lineTo(img.data('x') + 58, img.data('y') + 197);
-		con.lineTo(img.data('x') + 136, img.data('y') + 197);
-		con.fill();
+		if(progress < steps) {
+			con.beginPath();
+			con.save();
+			con.globalCompositionOperation = "lighter";
+			con.globalAlpha = progress / steps;
+			
+			con.moveTo(cov.data('x') + 98, cov.data('y') + 128);
+			con.lineTo(cov.data('x') + 58, cov.data('y') + 197);
+			con.lineTo(cov.data('x') + 136, cov.data('y') + 197);
+			con.fill();
+			con.restore();
+			requestAnimationFrame(drawTriangles);
+		}
 	}
 
 	$(canv).bind("mouseover", function(e) {
