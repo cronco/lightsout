@@ -11,6 +11,7 @@ jQuery(document).ready(function($){
 		movingImg,
 		started = false,
 		triangles,
+		binding,
 		requestAnimationFrame = window.requestAnimationFrame 
 					|| window.mozRequestAnimationFrame 
 					||  window.webkitRequestAnimationFrame 
@@ -20,75 +21,75 @@ jQuery(document).ready(function($){
 	triangles = [
 		{},
 		{ 
-			x1: 98,
+			x1: 97,
 			y1: 128,
-			x2: 58,
-			y2: 196,
-			x3: 136,
-			y3: 196,
+			x2: 57,
+			y2: 198,
+			x3: 138,
+			y3: 198,
 			animated: false
 		},
 		{ 
-			x1: 58,
-			y1: 203,
-			x2: 136,
-			y2: 203,
+			x1: 57,
+			y1: 202,
+			x2: 138,
+			y2: 202,
 			x3: 97,
-			y3: 270,
+			y3: 272,
 			animated: false
 		},
 		{ 
-			x1: 104,
-			y1: 270,
-			x2: 181,
-			y2: 270,
-			x3: 143,
-			y3: 205,
-			animated: false
-		},
-		{ 
-			x1: 229,
-			y1: 129,
-			x2: 306,
-			y2: 129,
-			x3: 268,
-			y3: 196,
-			animated: false
-		},
-		{ 
-			x1: 223,
-			y1: 129,
+			x1: 102,
+			y1: 272,
 			x2: 183,
-			y2: 196,
-			x3: 262,
-			y3: 196,
+			y2: 272,
+			x3: 142,
+			y3: 202,
 			animated: false
 		},
 		{ 
-			x1: 183,
-			y1: 203,
-			x2: 262,
-			y2: 203,
+			x1: 227,
+			y1: 127,
+			x2: 308,
+			y2: 127,
+			x3: 267,
+			y3: 198,
+			animated: false
+		},
+		{ 
+			x1: 222,
+			y1: 127,
+			x2: 182,
+			y2: 198,
+			x3: 263,
+			y3: 198,
+			animated: false
+		},
+		{ 
+			x1: 182,
+			y1: 202,
+			x2: 263,
+			y2: 202,
 			x3: 222,
-			y3: 271,
+			y3: 273,
 			animated: false
 		},
 		{ 
-			x1: 268,
-			y1: 204,
-			x2: 229,
-			y2: 270,
-			x3: 306,
-			y3: 270,
+			x1: 267,
+			y1: 202,
+			x2: 227,
+			y2: 272,
+			x3: 308,
+			y3: 272,
 			animated: false
 		},
 		{ 
 			x1: 313,
-			y1: 270,
-			x2: 273,
-			y2: 203,
-			x3: 351,
-			y3: 203,
+			y1: 272,
+			x2: 272,
+			y2: 202,
+			x3: 353,
+			y3: 202,
 			animated: false
 		},
 		
@@ -342,7 +343,7 @@ jQuery(document).ready(function($){
 				$i.data('w'), $i.data('h'));
 		drawAnchors(canv, $i);
 		drawCover();
-		console.log("userImg:", $i.data('x'), $i.data('y'), $i.data('w'), $i.data('h'));
+		//console.log("userImg:", $i.data('x'), $i.data('y'), $i.data('w'), $i.data('h'));
 		//startDrawingTriangles(1, canv, img);
 
 	}
@@ -392,14 +393,14 @@ jQuery(document).ready(function($){
 	}
 
 	function startDrawingTriangles(triangleNo) {
+		var start = window.mozAnimationStartTime;
 		triangles[triangleNo]['animated'] = true;
-		start = window.mozAnimationStartTime;
 		requestAnimationFrame(function(timestamp){
-			drawTriangles(timestamp, triangleNo);
+			drawTriangles(timestamp, triangleNo, start);
 		});
 	}
 
-	function drawTriangles(timestamp, triangleNo) {
+	function drawTriangles(timestamp, triangleNo, start) {
 		var con = canv.getContext("2d"),
 		progress = timestamp - start,
 		cov = $(img),
@@ -421,7 +422,7 @@ jQuery(document).ready(function($){
 			con.fillStyle = "#fff";
 			//con.globalCompositionOperation = "destination-atop";
 			if( progress < steps / 4) {
-				con.globalAlpha = (progress / steps) * 3;
+				con.globalAlpha = (progress / steps) * 3.5;
 			} else {
 				con.globalAlpha = (steps - progress) / steps;
 			}
@@ -434,7 +435,7 @@ jQuery(document).ready(function($){
 			con.fill();
 			con.restore();
 			requestAnimationFrame(function(timestamp) {
-				drawTriangles(timestamp, triangleNo);
+				drawTriangles(timestamp, triangleNo, start);
 			});
 		} else {
 			triangles[triangleNo]['animated'] = false;
@@ -463,15 +464,15 @@ jQuery(document).ready(function($){
 			$i = $(userImg),
 			anchor;
 
-		function dragListener(e) {
+		var dragListener = function (e) {
 
 			console.log(e.clientX - mouseX, e.clientY - mouseY);
 			moveImage(e.clientX - mouseX, e.clientY - mouseY);
 			mouseX = e.clientX;
 			mouseY = e.clientY;
-		}
+		};
 
-		function resizeListener(e) {
+		var resizeListener = function (e) {
 			var dx = e.clientX - mouseX,
 				dy = e.clientY - mouseY;
 
@@ -481,7 +482,7 @@ jQuery(document).ready(function($){
 				} else {
 					dy = -dx;
 				}
-			}
+			};
 
 			console.log(dx, dy);
 			switch (anchor) {
@@ -507,15 +508,17 @@ jQuery(document).ready(function($){
 			anchor = clickedInAnchors(e, canv, $i);
 			if(anchor) {
 				$(this).bind("mousemove", resizeListener);
+				binding = resizeListener;
 			} else if(clickedInImage(e, canv, $i)) {
 				$(this).bind("mousemove", dragListener);
+				binding = dragListener;
 			}
 		}
 
 		}).bind("mouseup", function(e) {
 
-			$(this).unbind("mousemove", resizeListener);
-			$(this).unbind("mousemove", dragListener);
+			//$(this).unbind("mousemove", resizeListener);
+			$(this).unbind("mousemove", binding);
 	});
 
 	$("#download").click(function(e) {
