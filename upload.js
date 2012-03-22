@@ -6,7 +6,7 @@ jQuery(document).ready(function($){
 		dragListener,
 		dim = 18,
 		ratio = 2,
-		steps = 700,
+		steps = 650,
 		step = 0,
 		movingImg,
 		started = false,
@@ -15,8 +15,12 @@ jQuery(document).ready(function($){
 		requestAnimationFrame = window.requestAnimationFrame 
 					|| window.mozRequestAnimationFrame 
 					||  window.webkitRequestAnimationFrame 
-					|| window.msRequestAnimationFrame,
-	  start = window.mozAnimationStartTime;  // Only supported in FF. Other browsers can use something like Date.now(). 
+					|| window.oRequestAnimationFrame      
+					|| window.msRequestAnimationFrame
+					|| function (callback) {
+						window.setTimeout(callback, 1000/60);
+					},
+		animationCallbacks = [];
 	
 	triangles = [
 		{},
@@ -27,6 +31,7 @@ jQuery(document).ready(function($){
 			y2: 198,
 			x3: 138,
 			y3: 198,
+			inTriangle: false,
 			animated: false
 		},
 		{ 
@@ -36,6 +41,7 @@ jQuery(document).ready(function($){
 			y2: 202,
 			x3: 97,
 			y3: 272,
+			inTriangle: false,
 			animated: false
 		},
 		{ 
@@ -45,6 +51,7 @@ jQuery(document).ready(function($){
 			y2: 272,
 			x3: 142,
 			y3: 202,
+			inTriangle: false,
 			animated: false
 		},
 		{ 
@@ -54,6 +61,7 @@ jQuery(document).ready(function($){
 			y2: 127,
 			x3: 267,
 			y3: 198,
+			inTriangle: false,
 			animated: false
 		},
 		{ 
@@ -63,6 +71,7 @@ jQuery(document).ready(function($){
 			y2: 198,
 			x3: 263,
 			y3: 198,
+			inTriangle: false,
 			animated: false
 		},
 		{ 
@@ -72,6 +81,7 @@ jQuery(document).ready(function($){
 			y2: 202,
 			x3: 222,
 			y3: 273,
+			inTriangle: false,
 			animated: false
 		},
 		{ 
@@ -81,6 +91,7 @@ jQuery(document).ready(function($){
 			y2: 272,
 			x3: 308,
 			y3: 272,
+			inTriangle: false,
 			animated: false
 		},
 		{ 
@@ -90,6 +101,7 @@ jQuery(document).ready(function($){
 			y2: 202,
 			x3: 353,
 			y3: 202,
+			inTriangle: false,
 			animated: false
 		},
 		
@@ -386,15 +398,25 @@ jQuery(document).ready(function($){
 
 			if(con.isPointInPath(x, y)) {
 				return i;
+			} else {
+				triangles[i]['inTriangle'] = false;
 			}
 		}
 		return null;
 		
 	}
 
+	//the function to call when you want to animate one of the triangles
 	function startDrawingTriangles(triangleNo) {
-		var start = window.mozAnimationStartTime;
+		var start = window.mozAnimationStartTime || Date.now();
+		console.log('woohoo');
+		console.log(start);
 		triangles[triangleNo]['animated'] = true;
+
+		//we need to make a closure because afaik the callback to requestAnimationFrame
+		//only gets the timestamp argument. (that doesn't sound right
+		//TODO: investigate callback behaviour
+
 		requestAnimationFrame(function(timestamp){
 			drawTriangles(timestamp, triangleNo, start);
 		});
@@ -446,8 +468,9 @@ jQuery(document).ready(function($){
 	$(canv).bind("mousemove", function(e) {
 		var triangle = clickedInTriangles(e);
 		if(triangle) {
-			console.log(triangle);
-			if(!triangles[triangle]['animated']) {
+			if(!triangles[triangle]['animated'] && !triangles[triangle]['inTriangle']) {
+				console.log(triangle);
+				triangles[triangle]['inTriangle'] = true;
 				startDrawingTriangles(triangle);
 			}
 		} else if(clickedInImage(e, canv, userImg)) {
